@@ -1,0 +1,21 @@
+name: devMinikubeEnv
+type: resource.environment
+driver: kube
+description: Environment variables provided by the local development environment
+provides:
+  - type: environment.properties
+    name: appEnvProps
+    description: Application Properties
+    params:
+      - name: app_message
+        value: 'Hello from Rezolvr!'
+uses: # This is really ".Platform"
+  - type: platform.settings
+    name: default
+    params:
+      - name: numInstances
+        value: 1
+      - name: imagePullPolicy
+        value: Never
+      - name: serviceType
+        value: NodePort

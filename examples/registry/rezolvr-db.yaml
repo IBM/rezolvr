@@ -1,0 +1,55 @@
+name: postgres
+type: resource.db.postgres
+driver: docker.local
+description: Locally-used database
+provides:
+  - type: service.db.postgres
+    name: mydb
+    description: Credentials for accessing the database
+    params:
+      - name: db_username
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_username.Value}}{{end}}'
+      - name: db_password
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_password.Value}}{{end}}'
+      - name: db_port
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_port.Value}}{{end}}'
+      - name: db_name
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_name.Value}}{{end}}'
+      - name: db_host
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_host.Value}}{{end}}'
+      - name: containerName
+        formula: '{{.Component.Name}}'
+      - name: imageName
+        formula: '{{with(index .Needs "service.container.registry:imageRegistry")}}{{.Params.endpoint.Value}}{{end}}/{{.Component.Name}}'
+      - name: image.tag
+        value: 'latest'
+uses:
+  - type: environment
+    params:
+      - name: POSTGRES_PASSWORD
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_password.Value}}{{end}}'
+      - name: POSTGRES_USER
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_username.Value}}{{end}}'
+      - name: POSTGRES_DB
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_name.Value}}{{end}}'
+needs:
+  - type: environment.properties
+    name: dbEnvProps
+    description: Credentials for accessing the database
+    params:
+      - name: db_username
+        required: true
+      - name: db_password
+        required: true
+      - name: db_name
+        required: true
+      - name: db_port
+        defaultValue: 5432
+      - name: db_host
+        required: true
+  - type: service.container.registry
+    name: imageRegistry
+    localName: registry
+    params:
+      - name: endpoint
+        required: true

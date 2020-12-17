@@ -1,0 +1,25 @@
+name: devDockerEnv
+type: resource.environment
+driver: docker
+description: Environment variables provided by the local environment
+provides:
+  - type: environment.properties
+    name: registryProps
+    description: Local dev environment registry properties
+    params:
+      - name: endpoint
+        value: host.minikube.internal:5000
+  - type: environment.properties
+    name: dbEnvProps
+    description: Database properties
+    params:
+      - name: db_username
+        value: abetterusername
+      - name: db_password
+        value: passwordie
+      - name: db_name
+        value: catalog
+      - name: db_port
+        value: 5432
+      - name: db_host
+        value: host.docker.internal

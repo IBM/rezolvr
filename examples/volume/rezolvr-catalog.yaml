@@ -1,0 +1,49 @@
+name: catalog
+type: resource.web.app
+description: A simple web app
+provides:
+  - type: service.web.app
+    name: catalogapp
+    description: An endpoint which can be called by others
+    params:
+      - name: path
+        value: /charters
+      - name: port
+        value: 3001
+      - name: imageName
+        formula: '{{with(index .Needs "service.container.registry:imageRegistry")}}{{.Params.endpoint.Value}}{{end}}/{{.Component.Name}}'
+      - name: image.tag
+        value: 'latest'
+uses:
+  - type: environment
+    params:
+      - name: DB_USER
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_username.Value}}{{end}}'
+      - name: DB_PW
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_password.Value}}{{end}}'
+      - name: DB_PORT
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_port.Value}}{{end}}'
+      - name: DB_NAME
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_name.Value}}{{end}}'
+      - name: DB_HOST
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_host.Value}}{{end}}'
+needs:
+  - type: service.db.postgres
+    name: mydb
+    description: Back-end database
+    params:
+      - name: db_username
+        required: true
+      - name: db_password
+        required: true
+      - name: db_port
+        required: true
+      - name: db_name
+        required: true
+      - name: db_host
+        required: true
+  - type: service.container.registry
+    name: imageRegistry
+    params:
+      - name: endpoint
+        required: true

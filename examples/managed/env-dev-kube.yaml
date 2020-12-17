@@ -1,0 +1,38 @@
+name: devMinikubeEnv
+type: resource.environment
+driver: kube
+description: Environment variables provided by the local environment
+provides:
+  - type: environment.properties
+    name: dbEnvProps
+    description: Database properties
+    params:
+      - name: db_username
+        value: admin
+      - name: db_password
+        value: Van2Halenz
+      - name: db_name
+        value: ibmclouddb
+      - name: db_port
+        value: 32390
+      - name: db_host
+        value: 1758ec87-47c1-4bea-b397-75adeaa26611.budepemd0im5pmu4u60g.databases.appdomain.cloud
+uses: # This is really ".Platform"
+  - type: platform.settings
+    name: default
+    params:
+      - name: numInstances
+        value: 2
+      - name: imagePullPolicy
+        value: Never
+      - name: serviceType
+        value: NodePort
+  - type: platform.settings
+    name: mydb
+    params:
+      - name: isExternal
+        value: true
+      - name: numInstances
+        value: 1
+      - name: serviceType
+        value: ClusterIP

@@ -1,0 +1,26 @@
+name: welcome
+type: component.web.app
+description: A simple welcome web app component
+provides:
+  - type: service.web.app
+    name: welcomeappservice
+    description: A basic application service to ensure the site is running
+    params:
+      - name: path
+        value: /message
+      - name: port
+        value: 3000
+      - name: imageName
+        formula: '{{.Component.Name}}'
+uses:
+  - type: environment
+    params:
+      - name: APP_MSG
+        formula: '{{with(index .Needs "environment.properties:appEnvProps")}}{{.Params.app_message.Value}}{{end}}'
+needs:
+  - type: environment.properties
+    name: appEnvProps
+    description: Application properties
+    params:
+      - name: app_message
+        required: true

@@ -1,0 +1,17 @@
+name: devDockerEnv
+type: resource.environment
+driver: docker
+description: Environment variables provided by the local environment
+provides:
+  - type: environment.properties
+    name: dbEnvProps
+    description: Database properties
+    params:
+      - name: db_username
+        value: abetterusername
+      - name: db_password
+        value: passwordie
+      - name: db_port
+        value: 5432
+      - name: db_host
+        value: host.docker.internal

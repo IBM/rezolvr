@@ -1,0 +1,50 @@
+name: somevolume
+type: resource.storage.volume
+description: A volume for persisting data
+provides:
+  - type: storage.volume
+    name: dbvolume
+    params:
+      - name: name
+        value: dbvolume
+      - name: volumeSize
+        formula: '{{with(index .Needs "environment.properties:volumeProps")}}{{.Params.volumeSize.Value}}{{end}}'
+      - name: volumeRequestSize
+        formula: '{{with(index .Needs "environment.properties:volumeProps")}}{{if .Params.volumeRequestSize.Value}}{{.Params.volumeRequestSize.Value}}{{else}}{{.Params.volumeSize.Value}}{{end}}{{end}}'
+      - name: volumeMode
+        formula: '{{with(index .Needs "environment.properties:volumeProps")}}{{.Params.volumeMode.Value}}{{end}}'
+      - name: accessModes
+        formula: '{{with(index .Needs "environment.properties:volumeProps")}}{{.Params.accessModes.Value}}{{end}}'
+      - name: persistentVolumeReclaimPolicy
+        formula: '{{with(index .Needs "environment.properties:volumeProps")}}{{.Params.persistentVolumeReclaimPolicy.Value}}{{end}}'
+      - name: hostPath
+        formula: '{{with(index .Needs "environment.properties:volumeProps")}}{{.Params.hostPath.Value}}{{end}}'
+  - type: storage.volume-claim
+    name: dbvolumeclaim
+    params:
+      - name: name
+        value: dbvolumeclaim
+      - name: volumeRequestSize
+        formula: '{{with(index .Needs "environment.properties:volumeProps")}}{{if .Params.volumeRequestSize.Value}}{{.Params.volumeRequestSize.Value}}{{else}}{{.Params.volumeSize.Value}}{{end}}{{end}}'
+      - name: volumeMode
+        formula: '{{with(index .Needs "environment.properties:volumeProps")}}{{.Params.volumeMode.Value}}{{end}}'
+      - name: accessModes
+        formula: '{{with(index .Needs "environment.properties:volumeProps")}}{{.Params.accessModes.Value}}{{end}}'
+uses:
+needs:
+  - type: environment.properties
+    name: volumeProps
+    description: Information about the volume
+    params:
+      - name: volumeSize
+        required: true
+      - name: volumeRequestSize
+        required: false
+      - name: volumeMode
+        required: true
+      - name: accessModes
+        required: true
+      - name: persistentVolumeReclaimPolicy
+        required: true
+      - name: hostPath
+        required: true

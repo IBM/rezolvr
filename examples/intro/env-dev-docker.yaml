@@ -1,0 +1,11 @@
+name: devDockerEnv
+type: resource.environment
+driver: docker
+description: Environment variables provided by the local development environment
+provides:
+  - type: environment.properties
+    name: appEnvProps
+    description: Application Properties
+    params:
+      - name: app_message
+        value: 'Hello from Rezolvr!'

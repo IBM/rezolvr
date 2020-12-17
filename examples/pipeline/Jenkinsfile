@@ -1,0 +1,50 @@
+node {
+    stage('Clone main repo') {
+        cleanWs()
+        sh 'git config --global user.email "someuser@somedomain.co"'
+        sh 'git config --global user.name "Jenkie Jenkins"'
+        sh 'mkdir -p deploy'
+        dir("deploy") {
+            checkout([$class: 'GitSCM',
+                branches: [[name: '*/master']],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [],
+                submoduleCfg: [],
+                userRemoteConfigs: [[credentialsId: '548c572f-09f7-40ef-8f15-ab014be77052', 
+                                     url: 'https://github.com/tcrowleyibm/catalog_deploy.git']]])
+            sh 'git checkout master'
+        }
+    }
+    
+    stage('Clone catalog repo') {
+        sh 'mkdir -p catalog'
+        dir("catalog") {
+            checkout([$class: 'GitSCM',
+                branches: [[name: '*/main']],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [],
+                submoduleCfg: [],
+                userRemoteConfigs: [[credentialsId: '548c572f-09f7-40ef-8f15-ab014be77052',
+                                     url: 'https://github.com/tcrowleyibm/catalog.git']]])
+        }
+    }
+    
+    stage('Resolve dependencies') {
+        sh 'pwd'
+        sh 'export REZOLVR_PLUGINDIR=/usr/share/rezolvr/plugins/'
+        sh 'rezolvr apply -a ./catalog/rezolvr/catalog.yaml -a ./deploy/rezolvr/rezolvr-db.yaml -e ./deploy/rezolvr/env-dev-kube.yaml -s ./deploy/rezolvr/state.yaml -o ./deploy/deploy/'
+    }
+
+    stage('Push changes back to git') {
+        dir("deploy") {
+            withCredentials([usernamePassword(credentialsId: '548c572f-09f7-40ef-8f15-ab014be77052',
+                 usernameVariable: 'username',
+                 passwordVariable: 'password')]){
+                sh 'git add .'
+                sh 'git commit -m "Jenkins update to the deployment files"'
+                sh("git push http://$username:$password@github.com/tcrowleyibm/catalog_deploy.git")
+            }
+        }
+    }
+
+}

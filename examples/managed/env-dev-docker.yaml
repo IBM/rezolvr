@@ -1,0 +1,25 @@
+name: devDockerEnv
+type: resource.environment
+driver: docker
+description: Environment variables provided by the local environment
+provides:
+  - type: environment.properties
+    name: dbEnvProps
+    description: Database properties
+    params:
+      - name: db_username
+        value: admin
+      - name: db_password
+        value: Van2Halenz
+      - name: db_name
+        value: ibmclouddb
+      - name: db_port
+        value: 32390
+      - name: db_host
+        value: 1758ec87-47c1-4bea-b397-75adeaa26611.budepemd0im5pmu4u60g.databases.appdomain.cloud
+uses:
+  - type: platform.settings
+    name: mydb
+    params:
+      - name: isExternal
+        value: true

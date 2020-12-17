@@ -1,0 +1,42 @@
+name: devMinikubeEnv
+type: resource.environment
+driver: kube
+description: Environment variables provided by the local environment
+provides:
+  - type: environment.properties
+    name: registryProps
+    description: Local dev environment registry properties
+    params:
+      - name: endpoint
+        value: host.minikube.internal:5000
+  - type: environment.properties
+    name: dbEnvProps
+    description: Database properties
+    params:
+      - name: db_username
+        value: abetterusername
+      - name: db_password
+        value: passwordie
+      - name: db_port
+        value: 5432
+      - name: db_host
+        value: mydb-service
+      - name: db_name
+        value: catalog
+uses: # This is really ".Platform"
+  - type: platform.settings
+    name: default
+    params:
+      - name: numInstances
+        value: 2
+      - name: imagePullPolicy
+        value: Always
+      - name: serviceType
+        value: NodePort
+  - type: platform.settings
+    name: mydb
+    params:
+      - name: numInstances
+        value: 1
+      - name: serviceType
+        value: ClusterIP

@@ -1,0 +1,42 @@
+name: catalog
+type: resource.web.app
+description: A catalog for fishing charters
+provides:
+  - type: service.web.app
+    name: catalogapp
+    description: An endpoint which can be called by others
+    params:
+      - name: path
+        value: /dbtime
+      - name: port
+        value: 3001
+      - name: imageName
+        formula: '{{.Component.Name}}'
+uses:
+  - type: environment
+    params:
+      - name: DB_USER
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_username.Value}}{{end}}'
+      - name: DB_PW
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_password.Value}}{{end}}'
+      - name: DB_PORT
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_port.Value}}{{end}}'
+      - name: DB_NAME
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_name.Value}}{{end}}'
+      - name: DB_HOST
+        formula: '{{with(index .Needs "service.db.postgres:mydb")}}{{.Params.db_host.Value}}{{end}}'
+needs:
+  - type: service.db.postgres
+    name: mydb
+    description: Back-end database
+    params:
+      - name: db_username
+        required: true
+      - name: db_password
+        required: true
+      - name: db_port
+        required: true
+      - name: db_name
+        required: true
+      - name: db_host
+        required: true

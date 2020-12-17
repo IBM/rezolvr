@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.ProvideParams.name.Value}}
+spec:
+  selector:
+    app: {{.ProvideParams.name.Value}}
+  ports:
+    - port: {{.ProvideParams.port.Value}}
+      targetPort: {{.ProvideParams.port.Value}}

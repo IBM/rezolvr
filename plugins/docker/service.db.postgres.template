@@ -1,0 +1,8 @@
+    image: {{.ProvideParams.imageName.Value}}{{ if .Uses.storage.Params.volumeName.Value }}
+    volumes:
+     - {{.Uses.storage.Params.volumeName.Value}}:{{.Uses.storage.Params.mountPath.Value}}{{end}}
+    ports: 
+      - "{{.ProvideParams.db_port.Value}}:{{.ProvideParams.db_port.Value}}"
+{{ if .Uses.environment }}    environment:{{range $key, $value := .Uses.environment.Params }}
+      {{$key}}: {{$value.Value}}{{end}}
+{{end}}

@@ -1,0 +1,6 @@
+    image: {{.ProvideParams.imageName.Value}}
+    ports: 
+      - "{{.ProvideParams.port.Value}}:{{.ProvideParams.port.Value}}"
+{{ if .Uses.environment }}    environment:{{range $key, $value := .Uses.environment.Params }}
+      {{$key}}: {{$value.Value}}{{end}}
+{{end}}

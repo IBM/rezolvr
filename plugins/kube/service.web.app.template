@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Component.Name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{.Provides.Name}}
+  replicas: {{.Platform.numInstances.Value}}
+  template:
+    metadata:
+      labels:
+        app: {{.Provides.Name}}
+    spec:
+      containers:
+        - name: {{.Provides.Name}}
+          image: {{.ProvideParams.imageName.Value}}
+          imagePullPolicy: {{.Platform.imagePullPolicy.Value}} {{ if .Uses.storage }}
+          volumeMounts:
+          - mountPath: "/foo/bar"
+            name: happy {{end}}
+          ports:
+          - containerPort: {{.ProvideParams.port.Value}}{{if .Uses.environment}}
+          env:{{range $key, $value := .Uses.environment.Params }}
+          - name: {{$key}}
+            value: '{{$value.Value}}'{{end}}{{end}} {{if .Uses.storage }}
+      volumes:
+        - name: happy
+          persistentVolumeClaim:
+            claimName: pvc-name {{end}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Provides.Name}}-service
+  namespace: default
+  labels:
+    app: {{.Component.Name}}
+spec:
+  type: NodePort
+  selector:
+    app: {{.Provides.Name}}
+  ports:
+    - protocol: TCP
+      port: {{.ProvideParams.port.Value}}
+      targetPort: {{.ProvideParams.port.Value}}
+      nodePort: 30163

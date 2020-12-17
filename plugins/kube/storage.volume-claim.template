@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{.ProvideParams.name.Value}}
+spec:{{ if .ProvideParams.storageClassName.Value}}
+  storageClassName: {{.ProvideParams.storageClassName.Value}}{{end}}
+  volumeMode: {{.ProvideParams.volumeMode.Value}}
+  accessModes:
+    - {{.ProvideParams.accessModes.Value}}
+  resources:
+    requests:
+      storage: {{.ProvideParams.volumeRequestSize.Value}}

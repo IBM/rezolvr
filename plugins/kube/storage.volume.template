@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{.ProvideParams.name.Value}}
+spec:
+  capacity:
+    storage: {{.ProvideParams.volumeSize.Value}}
+  volumeMode: {{.ProvideParams.volumeMode.Value}}
+  accessModes:
+    - {{.ProvideParams.accessModes.Value}}
+  hostPath:
+    path: {{.ProvideParams.hostPath.Value}}
+  persistentVolumeReclaimPolicy: {{.ProvideParams.persistentVolumeReclaimPolicy.Value}}{{ if .ProvideParams.storageClassName.Value}}
+  storageClassName: {{.ProvideParams.storageClassName.Value}}{{end}}
