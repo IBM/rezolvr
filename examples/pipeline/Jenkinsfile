@@ -1,10 +1,21 @@
 node {
+    def deployRepoDir = ''
+    def sourceTrigger = '' // Determine if this job was launched/triggered by a component repo
+
+    stage('Initial setup') {
+        if (params.source == 'catalog' || params.source == 'welcome' || params.source == 'orders') {
+            sourceTrigger = params.source
+            echo "Build triggered by a component. Source component = ${sourceTrigger}"
+        }
+    }
+
     stage('Clone main repo') {
         cleanWs()
         sh 'git config --global user.email "someuser@somedomain.co"'
         sh 'git config --global user.name "Jenkie Jenkins"'
         sh 'mkdir -p deploy'
         dir("deploy") {
+            deployRepoDir = pwd()
             checkout([$class: 'GitSCM',
                 branches: [[name: '*/master']],
                 doGenerateSubmoduleConfigurations: false,
@@ -16,23 +27,38 @@ node {
         }
     }
     
-    stage('Clone catalog repo') {
-        sh 'mkdir -p catalog'
-        dir("catalog") {
-            checkout([$class: 'GitSCM',
-                branches: [[name: '*/main']],
-                doGenerateSubmoduleConfigurations: false,
-                extensions: [],
-                submoduleCfg: [],
-                userRemoteConfigs: [[credentialsId: '548c572f-09f7-40ef-8f15-ab014be77052',
-                                     url: 'https://github.com/tcrowleyibm/catalog.git']]])
+    if (sourceTrigger != '') {
+        stage("Clone ${sourceTrigger} repo") {
+            sh "mkdir -p ${sourceTrigger}"
+            dir(sourceTrigger) {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[credentialsId: '548c572f-09f7-40ef-8f15-ab014be77052',
+                                        url: "https://github.com/tcrowleyibm/${sourceTrigger}.git"]]])
+            }
+        }
+        
+        stage('Copy rezolvr files to the deploy project') {
+            dir(sourceTrigger) {
+                def sourceRepoDir = pwd()
+                sh "cp ${sourceRepoDir}/rezolvr/*.yaml ${deployRepoDir}/rezolvr/"
+            }
+        }
+    } else {
+        stage('No trigger') {
+            echo "Build not triggered by a component repository, so source repo steps have been skipped"
         }
     }
-    
+
     stage('Resolve dependencies') {
+        dir("deploy") {
         sh 'pwd'
         sh 'export REZOLVR_PLUGINDIR=/usr/share/rezolvr/plugins/'
-        sh 'rezolvr apply -a ./catalog/rezolvr/catalog.yaml -a ./deploy/rezolvr/rezolvr-db.yaml -e ./deploy/rezolvr/env-dev-kube.yaml -s ./deploy/rezolvr/state.yaml -o ./deploy/deploy/'
+        sh 'rezolvr apply -a ./rezolvr/databases.yaml -a ./rezolvr/welcome.yaml -a ./rezolvr/catalog.yaml -a ./rezolvr/orders.yaml -e ./rezolvr/environment-staging.yaml -s ./rezolvr/state.yaml -o ./deploy/'
+        }
     }
 
     stage('Push changes back to git') {

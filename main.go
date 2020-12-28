@@ -201,7 +201,7 @@ func main() {
 			err = applyUpdatedComponents(cliArgs)
 		}
 		if err != nil {
-			log.Printf("Error encountered: %v\n", err)
+			log.Fatal("Error encountered: %v\n", err)
 		}
 	} else {
 		log.Fatal("Usage: only the 'apply' and 'export' commands are supported")

@@ -44,4 +44,4 @@ spec:
     - protocol: TCP
       port: {{.ProvideParams.port.Value}}
       targetPort: {{.ProvideParams.port.Value}}
-      nodePort: 30163
+      {{if .Platform.nodePort.Value}}nodePort: {{.Platform.nodePort.Value}}{{end}}
