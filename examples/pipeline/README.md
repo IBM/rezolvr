@@ -59,11 +59,11 @@ The steps for creating and running custom Jenkins containers are as follows:
           "deb [arch=amd64] https://download.docker.com/linux/debian \
           $(lsb_release -cs) stable"
     RUN apt-get update && apt-get install -y docker-ce-cli
-    COPY ../bin/rezolvr_linux_amd64 /usr/local/bin/rezolvr
-    COPY ../bin/plugindocker_linux_amd64.so /usr/share/rezolvr/plugins/docker/plugindocker.so
-    COPY ../bin/pluginkube_linux_amd64.so /usr/share/rezolvr/plugins/kube/pluginkube.so
-    COPY ../bin/plugins/docker/templates/*.template /usr/share/rezolvr/plugins/docker/templates/
-    COPY ../bin/plugins/kube/templates/*.template /usr/share/rezolvr/plugins/docker/templates/
+    COPY ../../bin/rezolvr_linux_amd64 /usr/local/bin/rezolvr
+    COPY ../../bin/plugindocker_linux_amd64.so /usr/share/rezolvr/plugins/docker/plugindocker.so
+    COPY ../../bin/pluginkube_linux_amd64.so /usr/share/rezolvr/plugins/kube/pluginkube.so
+    COPY ../../bin/plugins/docker/templates/*.template /usr/share/rezolvr/plugins/docker/templates/
+    COPY ../../bin/plugins/kube/templates/*.template /usr/share/rezolvr/plugins/docker/templates/
     ENV REZOLVR_PLUGINDIR=/usr/share/rezolvr/plugins/
     USER jenkins
     RUN jenkins-plugin-cli --plugins blueocean:1.24.3

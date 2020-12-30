@@ -15,19 +15,40 @@ spec:
       containers:
         - name: {{.Provides.Name}}
           image: {{.ProvideParams.imageName.Value}}
-          imagePullPolicy: {{.Platform.imagePullPolicy.Value}} {{ if .Uses.storage }}
+          imagePullPolicy: {{.Platform.imagePullPolicy.Value}}
+          {{- if .Uses.storage }}
           volumeMounts:
           - mountPath: "/foo/bar"
-            name: happy {{end}}
+            name: happy
+          {{- end}}
           ports:
-          - containerPort: {{.ProvideParams.port.Value}}{{if .Uses.environment}}
-          env:{{range $key, $value := .Uses.environment.Params }}
-          - name: {{$key}}
-            value: '{{$value.Value}}'{{end}}{{end}} {{if .Uses.storage }}
+          - containerPort: {{.ProvideParams.port.Value}}
+          {{- if gt (len .Uses) 0}}
+          env:
+          {{- end}}
+          {{- range $usesKey, $usesValue := .Uses }}
+          {{- if eq $usesValue.Type "environment"}}
+            {{- range $parmsKey, $parmsValue := $usesValue.Params}}
+          - name: {{$parmsKey}}
+            value: '{{$parmsValue.Value}}'
+            {{- end}}
+          {{- end}}
+          {{- if eq $usesValue.Type "secret"}}
+            {{- range $parmsKey, $parmsValue := $usesValue.Params}}
+          - name: {{$parmsKey}}
+            valueFrom:
+              secretKeyRef:
+                name: {{$usesValue.Name}}
+                key: {{$parmsValue.Value}}
+            {{- end}}
+          {{- end}}
+          {{- end}}
+          {{- if .Uses.storage }}
       volumes:
         - name: happy
           persistentVolumeClaim:
-            claimName: pvc-name {{end}}
+            claimName: pvc-name
+          {{- end}}
 ---
 apiVersion: v1
 kind: Service

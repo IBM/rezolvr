@@ -14,19 +14,40 @@ spec:
     spec:
       containers:
         - name: {{.Provides.Name}}
-          image: {{.ProvideParams.imageName.Value}} {{ if .Uses.storage.Params.volumeName.Value }}
+          image: {{.ProvideParams.imageName.Value}}
+          {{- if .Uses.storage.Params.volumeName.Value }}
           volumeMounts:
           - mountPath: {{.Uses.storage.Params.mountPath.Value}}
-            name: {{.Uses.storage.Params.volumeName.Value}} {{end}}
+            name: {{.Uses.storage.Params.volumeName.Value}}
+          {{- end}}
           ports:
-          - containerPort: {{.ProvideParams.db_port.Value}}{{if .Uses.environment}}
-          env:{{range $key, $value := .Uses.environment.Params }}
-          - name: {{$key}}
-            value: {{$value.Value}}{{end}}{{end}} {{if .Uses.storage }}
+          - containerPort: {{.ProvideParams.db_port.Value}}
+          {{- if gt (len .Uses) 0}}
+          env:
+          {{- end}}
+          {{- range $usesKey, $usesValue := .Uses }}
+          {{- if eq $usesValue.Type "environment"}}
+            {{- range $parmsKey, $parmsValue := $usesValue.Params}}
+          - name: {{$parmsKey}}
+            value: '{{$parmsValue.Value}}'
+            {{- end}}
+          {{- end}}
+          {{- if eq $usesValue.Type "secret"}}
+            {{- range $parmsKey, $parmsValue := $usesValue.Params}}
+          - name: {{$parmsKey}}
+            valueFrom:
+              secretKeyRef:
+                name: {{$usesValue.Name}}
+                key: {{$parmsValue.Value}}
+            {{- end}}
+          {{- end}}
+          {{- end}}
+          {{- if .Uses.storage }}
       volumes:
         - name: {{.Uses.storage.Params.volumeName.Value}}
           persistentVolumeClaim:
-            claimName: {{.Uses.storage.Params.volumeName.Value}}claim {{end}}
+            claimName: {{.Uses.storage.Params.volumeName.Value}}claim 
+          {{- end}}
 ---
 apiVersion: v1
 kind: Service
@@ -43,3 +64,4 @@ spec:
     - protocol: TCP
       port: {{.ProvideParams.db_port.Value}}
       targetPort: {{.ProvideParams.db_port.Value}}
+      {{if .Platform.nodePort.Value}}nodePort: {{.Platform.nodePort.Value}}{{end}}
