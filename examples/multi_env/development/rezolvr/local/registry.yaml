@@ -1,0 +1,17 @@
+name: imageRegistry
+type: resource.container.registry
+description: Registry for storing and retrieving container images
+provides:
+  - type: service.container.registry
+    name: imageRegistry
+    params:
+      - name: endpoint
+        formula: '{{with(index .Needs "environment.properties:registryProps")}}{{.Params.endpoint.Value}}{{end}}'
+uses:
+needs:
+  - type: environment.properties
+    name: registryProps
+    description: Values for the unmanaged resource
+    params:
+      - name: endpoint
+        required: true

@@ -1,0 +1,43 @@
+name: devCompose
+type: resource.environment
+driver: docker
+description: Environment variables provided by the local environment
+provides:
+  - type: environment.properties
+    name: dbEnvProps
+    description: Database properties
+    params:
+      - name: db_port
+        value: 5432
+      - name: db_host
+        value: host.docker.internal
+      - name: db_name
+        value: catalog
+  - type: environment.properties
+    name: appEnvProps
+    description: Application Properties
+    params:
+      - name: welcome_port
+        value: 3000
+      - name: catalog_port
+        value: 3001
+      - name: catalog_host
+        value: host.docker.internal
+      - name: orders_port
+        value: 3003
+      - name: orders_host
+        value: host.docker.internal
+      - name: app_message
+        value: 'Hello from Rezolvr!'
+  - type: environment.properties
+    name: registryProps
+    description: Local dev environment registry properties (not used, so it's blank)
+    params:
+      - name: endpoint
+        value: ''
+uses: # This is really ".Platform"
+  - type: platform.settings
+    name: ordersdb
+    params:
+      - name: isExternal
+        value: true
