@@ -57,12 +57,12 @@ Welcome:
 
 Charters:
 
-`https://github.com/tcrowleyibm/catalog.git`
+`https://github.com/tcrowleyibm/charters.git`
 
 
 Reservations:
 
-`https://github.com/tcrowleyibm/catalog_deploy.git`
+`https://github.com/tcrowleyibm/reservations.git`
 
 
 Deployment details for staging and performance environments:
@@ -188,8 +188,9 @@ own git repository. However, they're stored here for simplicity.
 3. Execute the following command:
    ```
    rezolvr apply -a ./rezolvr/local/credentials.yaml -a ./rezolvr/local/databases.yaml \
-      -a ./rezolvr/local/registry.yaml -a ../../welcome/rezolvr/welcome.yaml -a ../../charters/rezolvr/charters.yaml \
-      -a ../../reservations/rezolvr/reservations.yaml -e ./rezolvr/local/env-dev-compose.yaml -s ./rezolvr/local/state.yaml -o ./deploy/
+     -a ./rezolvr/local/registry.yaml -a ../welcome/rezolvr/welcome.yaml -a ../charters/rezolvr/charters.yaml \
+     -a ../reservations/rezolvr/reservations.yaml \
+     -e ./rezolvr/local/env-compose.yaml -s ./rezolvr/local/state.yaml -o ./deploy/ 
    ```
 4. After a successful run, a `docker-compose.yaml` file should be created in the `./deploy` directory. Also, a
    state file will be created in the `./local` directory.
@@ -443,9 +444,9 @@ configuration information.
 
 1. Push the images to the production-grade container registry. This is usually done via automation,
    but for simplicity, it can be done manually. The basic steps:
-   - Log in to the private registry with the appropriate credentials
-   - Tag the image with the private registry details
-   - Push the images to the private registry
+   - Log in to the private registry with the appropriate credentials (e.g. `ibmcloud cr login`)
+   - Tag the image with the private registry details (e.g. `docker tag catalog us.icr.io/my-registry/charters`, etc)
+   - Push the images to the private registry (e.g. `docker push us.icr.io/myregistry/charters`)
 2. Create a secret in the OpenShift environment. The process is similar to the instructions in the staging section.
 3. If you haven't created a Jenkins pipeline for the production environment, create it now. The `Jenkinsfile` can be found
    in the `./production/config` directory of the `gulfcharter_prod` git repo.
@@ -455,11 +456,14 @@ configuration information.
    Also, a state file will be created in the `./production/rezolvr/local` directory.
 7. Ideally, tooling similar to Argo CD should deploy the updated deployment files. However, they can be done manually by
    navigating to the `./production/deploy` directory and manually pushing the files to the production environment:
-   ```
-   kubectl apply -f chartersms.yaml
-   kubectl apply -f reservationsms.yaml
-   kubectl apply -f welcomeapp.yaml
-   ```
+   - Log into the Red Hat OpenShift cluster (e.g. `oc login --token=<some very long token> --server=<some server>`)
+   - Verify a successful connection (e.g. `kubectl get nodes`)
+   - Apply the deployment files:
+      ```
+      kubectl apply -f chartersms.yaml
+      kubectl apply -f reservationsms.yaml
+      kubectl apply -f welcomeapp.yaml
+      ```
    **Note:** There is no longer a deployment file for the database(s).
 8. Expose the endpoints by either using an ingress controller, or by creating OpenShift routes.
 
