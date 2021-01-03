@@ -3,7 +3,7 @@ type: resource.db.postgres
 description: Locally-used database
 provides:
   - type: service.db.postgres
-    name: ordersdb
+    name: reservationsdb
     description: Credentials for accessing the database
     params:
       - name: db_port
@@ -12,6 +12,8 @@ provides:
         value: postgres
       - name: db_host
         formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_host.Value}}{{end}}'
+      - name: db_use_ssl
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_use_ssl.Value}}{{end}}'
       - name: containerName
         formula: '{{.Component.Name}}'
       - name: imageName
@@ -19,7 +21,7 @@ provides:
       - name: image.tag
         value: 'latest'
   - type: service.db.postgres
-    name: catalogdb
+    name: chartersdb
     description: Credentials for accessing the database
     params:
       - name: db_port
@@ -28,6 +30,8 @@ provides:
         value: postgres
       - name: db_host
         formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_host.Value}}{{end}}'
+      - name: db_use_ssl
+        formula: '{{with(index .Needs "environment.properties:dbEnvProps")}}{{.Params.db_use_ssl.Value}}{{end}}'
       - name: containerName
         formula: '{{.Component.Name}}'
       - name: imageName
@@ -56,6 +60,8 @@ needs:
       - name: db_host
         required: true
       - name: db_name
+        required: true
+      - name: db_use_ssl
         required: true
   - type: environment.secret
     name: databasecredentials

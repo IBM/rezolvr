@@ -12,20 +12,22 @@ provides:
       - name: db_host
         value: host.docker.internal
       - name: db_name
-        value: catalog
+        value: charters
+      - name: db_use_ssl
+        value: 'false'
   - type: environment.properties
     name: appEnvProps
     description: Application Properties
     params:
       - name: welcome_port
         value: 3000
-      - name: catalog_port
+      - name: charters_port
         value: 3001
-      - name: catalog_host
+      - name: charters_host
         value: host.docker.internal
-      - name: orders_port
+      - name: reservations_port
         value: 3003
-      - name: orders_host
+      - name: reservations_host
         value: host.docker.internal
       - name: app_message
         value: 'Hello from Rezolvr!'
@@ -37,7 +39,7 @@ provides:
         value: ''
 uses: # This is really ".Platform"
   - type: platform.settings
-    name: ordersdb
+    name: reservationsdb
     params:
       - name: isExternal
         value: true
